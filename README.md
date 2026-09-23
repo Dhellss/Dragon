@@ -1,4 +1,4 @@
-## Project 1 — Dragon
+<img width="1898" height="1080" alt="image" src="https://github.com/user-attachments/assets/e3b114df-faa1-4592-be0c-dbb5815c3e46" />## Project 1 — Dragon
 
 **Vibe:** heaviest, most cinematic
 
@@ -9,3 +9,6 @@ A 3D serpent-dragon circles a glowing orb in the middle of the screen (three.js)
 - **Detail:** each page has its own glow colour — orange (home), green (projects), violet (contact).
 - **Tech:** three.js r128 from CDN, two `<canvas>` layers, JetBrains Mono.
 - **Note:** this is the only project that needs internet for its 3D script.
+
+
+
