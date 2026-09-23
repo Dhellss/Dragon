@@ -1,4 +1,3 @@
-<img width="1898" height="1080" alt="image" src="https://github.com/user-attachments/assets/e3b114df-faa1-4592-be0c-dbb5815c3e46" />## Project 1 — Dragon
 
 **Vibe:** heaviest, most cinematic
 
