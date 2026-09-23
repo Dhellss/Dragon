@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dhellskieee Dragon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- soft light in the background -->
+<canvas class="scene" id="scene" aria-hidden="true"></canvas>
+<!-- the daemon: a serpent-dragon guarding the kernel orb -->
+<div class="dragon-wrap" id="dragon-wrap">
+  <canvas class="dragon" id="dragon" aria-label="A 3D serpent-dragon circling a glowing orb. Click it."></canvas>
+  <div class="dragon-say" id="dragon-say" aria-live="polite"></div>
+</div>
+<div class="crt" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="brand" href="#home"><span class="ps">~/</span>dhellskieee<span class="cur"></span></a>
+  <nav class="tabs" aria-label="Main">
+    <a href="#home" data-link="home">home</a>
+    <a href="#projects" data-link="projects">projects</a>
+    <a href="#contact" data-link="contact">contact</a>
+    <span class="tab-dot" id="tab-dot" aria-hidden="true"></span>
+  </nav>
+</header>
+
+<main id="main">
+  <!-- HOME -->
+  <section class="page split" data-page="home">
+    <div class="side left">
+      <div class="win">
+        <div class="wbar"><i></i><i></i><i></i><span>~/dhellskieee/home</span></div>
+        <div class="wbody">
+          <div class="cmd"><span class="p">~/ dhellskieee :</span> whoami</div>
+          <h1 class="name">Dhellskieee<span class="block"></span></h1>
+          <p class="who"><b>Dhellmar Feliciano Mahilum</b><br><span>Computer Science Student</span></p>
+          <p class="intro">I write code, build games and websites, and learn how systems break so I can make them safer.</p>
+        </div>
+      </div>
+    </div>
+    <div class="mid-gap" aria-hidden="true"></div>
+    <div class="side right">
+      <div class="win">
+        <div class="wbar"><i></i><i></i><i></i><span>~/dhellskieee/interests</span></div>
+        <div class="wbody">
+          <div class="cmd"><span class="p">~/ dhellskieee :</span> ls interests/</div>
+          <ul class="ls" id="interests"></ul>
+          <div class="status"><span class="led"></span>status: online · open to collabs</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="page split" data-page="projects" hidden>
+    <div class="side left">
+      <div class="win">
+        <div class="wbar"><i></i><i></i><i></i><span>~/dhellskieee/projects</span></div>
+        <div class="wbody">
+          <div class="cmd"><span class="p">~/ dhellskieee :</span> ls -la projects/</div>
+          <h2>Things I've built.</h2>
+          <div class="projs" id="work-left"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mid-gap" aria-hidden="true"></div>
+    <div class="side right">
+      <div class="win">
+        <div class="wbar"><i></i><i></i><i></i><span>~/dhellskieee/projects</span></div>
+        <div class="wbody">
+          <div class="projs" id="work-right"></div>
+          <p class="note"># sample projects — send me your real ones</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="page split" data-page="contact" hidden>
+    <div class="side left">
+      <div class="win">
+        <div class="wbar"><i></i><i></i><i></i><span>~/dhellskieee/contact.txt</span></div>
+        <div class="wbody">
+          <div class="cmd"><span class="p">~/ dhellskieee :</span> cat contact.txt</div>
+          <h2>Let's make<br>something.</h2>
+          <div class="rows">
+            <div class="row"><span>gmail</span><a href="mailto:felicianomahilum@gmail.com">felicianomahilum@gmail.com</a><button type="button" data-copy="felicianomahilum@gmail.com">copy</button></div>
+            <div class="row"><span>github</span><a href="https://github.com/dhellss" target="_blank" rel="noopener">github.com/dhellss</a><button type="button" data-copy="https://github.com/dhellss">copy</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mid-gap" aria-hidden="true"></div>
+    <div class="side right">
+      <div class="win">
+        <div class="wbar"><i></i><i></i><i></i><span>~/dhellskieee/firefly.sh</span></div>
+        <div class="wbody">
+          <div class="cmd"><span class="p">~/ dhellskieee :</span> ./firefly.sh</div>
+          <button class="jar" id="jar" type="button" aria-label="Release a firefly">
+            <span class="lid"></span>
+            <span class="glass"><i></i><i></i><i></i></span>
+          </button>
+          <p class="jar-say" id="jar-say">click the jar. fireflies follow the dragon.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><span class="p">~/ dhellskieee :</span> echo <b>"malupet na hacker"</b></footer>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
