@@ -1,13 +1,8 @@
-/* three motion modes:
-   still — no motion at all (the visitor asked for it)
-   lite  — phones: same scene, fewer particles, slower frames, shorter page change
-   full  — everything */
-const mqSmall = matchMedia("(max-width: 600px)");
-const mqCalm = matchMedia("(prefers-reduced-motion: reduce)");
-const isStill = () => mqCalm.matches;
-const isLite = () => mqSmall.matches && !mqCalm.matches;
+const still = matchMedia("(prefers-reduced-motion: reduce)");
+const lite = matchMedia("(max-width: 600px)");   /* phones: same show, lighter load */
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const DPR = Math.min(mqSmall.matches ? 1.5 : 2, window.devicePixelRatio || 1);
+let DPR = Math.min(lite.matches ? 1.5 : 2, window.devicePixelRatio || 1);
+if (!still.matches) document.documentElement.classList.add("anim");
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
 /* each page has its own glow colour: dark orange / dark green / dark violet */
@@ -21,8 +16,9 @@ const cv = $("#scene"), ctx = cv.getContext("2d");
 let W, H, embers = [], bugs = [], puffs = [], last = 0;
 function buildBg() {
   W = innerWidth; H = innerHeight;
+  DPR = Math.min(lite.matches ? 1.5 : 2, window.devicePixelRatio || 1);
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
-  embers = Array.from({ length: mqSmall.matches ? 24 : 46 }, () => ({ x: Math.random() * W, y: Math.random() * H, r: .6 + Math.random() * 1.8, sp: 6 + Math.random() * 16, ph: Math.random() * 6 }));
+  embers = Array.from({ length: lite.matches ? 22 : 46 }, () => ({ x: Math.random() * W, y: Math.random() * H, r: .6 + Math.random() * 1.8, sp: 6 + Math.random() * 16, ph: Math.random() * 6 }));
 }
 function dragonCenter() {
   const r = $("#dragon").getBoundingClientRect();
@@ -49,13 +45,13 @@ function drawBg(now) {
   ctx.fillStyle = floor; ctx.beginPath(); ctx.arc(0, 0, W * .6, 0, 7); ctx.fill(); ctx.restore();
   /* embers drifting up */
   for (const e of embers) {
-    if (!isStill()) { e.y -= e.sp * dt; e.x += Math.sin(t + e.ph) * 6 * dt; if (e.y < -10) { e.y = H + 10; e.x = Math.random() * W; } }
+    if (!still.matches) { e.y -= e.sp * dt; e.x += Math.sin(t + e.ph) * 6 * dt; if (e.y < -10) { e.y = H + 10; e.x = Math.random() * W; } }
     ctx.fillStyle = `rgba(${r},${g},${b},${(.25 + .25 * Math.sin(t * 2 + e.ph)) * Math.min(1, P)})`;
     ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, 7); ctx.fill();
   }
   /* fireflies circling the dragon */
   for (const f of bugs) {
-    if (!isStill()) f.a += f.sp * dt;
+    if (!still.matches) f.a += f.sp * dt;
     let x = c.x + Math.cos(f.a) * f.r, y = c.y + Math.sin(f.a * 1.2 + f.wob) * f.r * .55;
     if (f.fly !== undefined && f.fly < 1) {
       f.fly = Math.min(1, f.fly + dt / 1.4);
@@ -75,7 +71,7 @@ function drawBg(now) {
   }
   puffs = puffs.filter(p => p.life > 0);
   ctx.globalCompositeOperation = "source-over";
-  if (!isStill() && flash > 0) flash = Math.max(0, flash - dt * 1.6);
+  if (!still.matches && flash > 0) flash = Math.max(0, flash - dt * 1.6);
 }
 function newBug(from) {
   const b = { a: Math.random() * 6.28, r: 120 + Math.random() * 90, sp: (.3 + Math.random() * .5) * (Math.random() < .5 ? -1 : 1), wob: Math.random() * 6 };
@@ -91,7 +87,7 @@ function initDragon() {
   if (!window.THREE) { $("#dragon").style.visibility = "hidden"; return; }
   const T = THREE, canvas = $("#dragon");
   let renderer;
-  try { renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true }); } catch (e) { canvas.style.visibility = "hidden"; return; }
+  try { renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: !lite.matches, powerPreference: "low-power" }); } catch (e) { canvas.style.visibility = "hidden"; return; }
   renderer.setPixelRatio(DPR);
   const scene = new T.Scene(), camera = new T.PerspectiveCamera(34, 1, .1, 100);
   camera.position.set(0, .95, 6.7); camera.lookAt(0, 0, 0);
@@ -176,7 +172,7 @@ function applyColor() {
 }
 function renderDragon(now) {
   if (!D.ok) return;
-  const t = now / 1000, moving = !isStill(), dt = D.lastT ? Math.min(.05, t - D.lastT) : 0; D.lastT = t;
+  const t = now / 1000, moving = !still.matches, dt = D.lastT ? Math.min(.05, t - D.lastT) : 0; D.lastT = t;
   if (moving) {
     D.u += dt * (D.speed + D.strike * 2.2);
     if (D.strike > 0) D.strike = Math.max(0, D.strike - dt * .9);
@@ -201,12 +197,11 @@ function screenOf(v3) {
 const orbPos = () => D.ok ? screenOf(new D.T.Vector3(0, 0, 0)) : dragonCenter();
 const mouthPos = () => D.ok ? screenOf(D.head.localToWorld(new D.T.Vector3(0, -.05, .7))) : dragonCenter();
 function roar(burst = true) {
-  if (isStill()) return;
+  if (still.matches) return;
   D.strike = 1;
   if (burst) setTimeout(() => {
     const m = mouthPos();
-    const n = isLite() ? 10 : 24;
-    for (let i = 0; i < n; i++) { const a = Math.random() * 6.28, sp = 50 + Math.random() * 150; puffs.push({ x: m.x, y: m.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * .7 - 30, s: 5 + Math.random() * 11, life: 1 + Math.random() * .6, max: 1.6 }); }
+    for (let i = 0; i < 24; i++) { const a = Math.random() * 6.28, sp = 50 + Math.random() * 150; puffs.push({ x: m.x, y: m.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * .7 - 30, s: 5 + Math.random() * 11, life: 1 + Math.random() * .6, max: 1.6 }); }
   }, 150);
 }
 
@@ -216,16 +211,16 @@ let li = 0, sayT;
 function say(html) { const s = $("#dragon-say"); s.innerHTML = html; clearTimeout(sayT); sayT = setTimeout(() => s.innerHTML = "", 2800); }
 $("#dragon").addEventListener("click", () => {
   say(LINES[li++ % LINES.length]);
-  if (!isStill()) { roar(); flash = .5; } else frame(performance.now());
+  if (!still.matches) { roar(); flash = .5; } else frame(performance.now());
 });
 
 /* =======================================================
    CONTENT
    ======================================================= */
 const INTERESTS = ["coding", "programming", "ethical-hacking", "cyber-security", "game-dev", "web-dev", "software-dev", "system-dev", "ui-ux-design", "ai"];
-$("#interests").innerHTML = INTERESTS.map(i => `<li>${i}/</li>`).join("");
+$("#interests").innerHTML = INTERESTS.map((i, n) => `<li style="--i:${n}">${i}/</li>`).join("");
 let chase = 0;
-setInterval(() => { if (isStill()) return; $$("#interests li").forEach((li, i) => li.classList.toggle("lit", i === chase % INTERESTS.length)); chase++; }, 900);
+setInterval(() => { if (still.matches) return; $$("#interests li").forEach((li, i) => li.classList.toggle("lit", i === chase % INTERESTS.length)); chase++; }, 900);
 
 const PROJECTS = [
   { id: "pixel-dungeon", perm: "drwxr-xr-x  12K  aug 14", desc: "2D roguelike with procedurally generated floors.", tags: ["C#", "Unity"] },
@@ -242,9 +237,9 @@ const JAR = ["one more friend for the dragon.", "bzzz.", "the dragon likes this 
 let ji = 0;
 $("#jar").addEventListener("click", () => {
   const r = $("#jar").getBoundingClientRect();
-  if (bugs.length < 26) bugs.push(newBug(isStill() ? null : { x: r.left + r.width / 2, y: r.top + 30 }));
+  if (bugs.length < (lite.matches ? 16 : 26)) bugs.push(newBug(still.matches ? null : { x: r.left + r.width / 2, y: r.top + 30 }));
   $("#jar-say").textContent = JAR[ji++ % JAR.length] + `  (${bugs.length} flying)`;
-  if (isStill()) frame(performance.now());
+  if (still.matches) frame(performance.now());
 });
 
 /* =======================================================
@@ -272,17 +267,6 @@ async function travel(to) {
   const next = GLOW[to];
   main.classList.add("leaving");
   moveDot(to);
-  /* phones get the short version: fade, colour swap, one small flare */
-  if (isLite()) {
-    await wait(220);
-    color = [...next]; setCSS(next);
-    power = 1; flash = .6; if (D.ok) D.strike = .7;
-    show(to, true);
-    main.classList.remove("leaving");
-    await wait(240);
-    busy = false;
-    return;
-  }
   await wait(420);
   /* 1) the dot leaves the tab bar and flies into the kernel orb */
   const d = $("#tab-dot").getBoundingClientRect(), sx = d.left + 3, sy = d.top + 3, tgt = orbPos();
@@ -313,9 +297,9 @@ async function travel(to) {
 function route() {
   const p = pages.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home";
   if (p === current) return;
-  if (current === null || isStill() || busy) {
+  if (current === null || still.matches || busy) {
     color = [...GLOW[p]]; setCSS(GLOW[p]); show(p, false);
-    if (isStill()) frame(performance.now());
+    if (still.matches) frame(performance.now());
     return;
   }
   travel(p);
@@ -332,23 +316,21 @@ $$("[data-copy]").forEach(b => b.addEventListener("click", async () => {
 
 /* loop */
 function frame(now) { drawBg(now); renderDragon(now); }
-let lastF = 0, running = false;
-function loop(now) {
-  if (isStill()) { running = false; return; }                  /* stop cleanly if motion gets turned off */
-  if (!document.hidden && now - lastF > (isLite() ? 34 : 28)) { lastF = now; frame(now); }
-  requestAnimationFrame(loop);
-}
-function startLoop() { if (running || isStill()) return; running = true; lastF = 0; requestAnimationFrame(loop); }
-function refresh() { buildBg(); D.size && D.size(); if (current) moveDot(current); frame(performance.now()); startLoop(); }
+let lastF = 0;
+function loop(now) { if (!document.hidden && now - lastF > (lite.matches ? 40 : 28)) { lastF = now; frame(now); } requestAnimationFrame(loop); }
 let rz;
-addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(refresh, 150); });
-/* rotating the phone or changing the motion setting switches mode live */
-[mqSmall, mqCalm].forEach(m => m.addEventListener ? m.addEventListener("change", refresh) : m.addListener(refresh));
+addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { buildBg(); D.size && D.size(); if (current) moveDot(current); frame(performance.now()); }, 150); });
+
+/* phones: the windows fade up as you scroll to them */
+const seen = "IntersectionObserver" in window && !still.matches
+  ? new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("seen")), { rootMargin: "0px 0px -8% 0px" })
+  : null;
+if (seen) $$(".win").forEach(w => seen.observe(w)); else $$(".win").forEach(w => w.classList.add("seen"));
 
 buildBg();
 bugs = Array.from({ length: 3 }, () => newBug());
 initDragon();
 route();
 frame(performance.now());
-startLoop();
+if (!still.matches) requestAnimationFrame(loop);
 document.fonts && document.fonts.ready.then(() => current && moveDot(current));
