@@ -10,8 +10,8 @@ A 3D serpent-dragon circles a glowing orb in the middle of the screen (three.js)
 - **Tech:** three.js r128 from CDN, two `<canvas>` layers, JetBrains Mono.
 - **Note:** this is the only project that needs internet for its 3D script.
 
-     ![Preview ng website](./image_1.png)
+     ![Preview ng website](./asset/image_1.png)
 
-     ![Preview ng website](./image_2.png)
+     ![Preview ng website](./asset/image_2.png)
 
-     ![Preview ng website](./image_3.png)
+     ![Preview ng website](./asset/image_3.png)
