@@ -1,6 +1,6 @@
 ## Project 1 — Dragon
 
-**Folder:** `Project1/` · **Vibe:** heaviest, most cinematic
+**Vibe:** heaviest, most cinematic
 
 A 3D serpent-dragon circles a glowing orb in the middle of the screen (three.js), lighting the whole page. Content sits in terminal-style windows on the left and right. A CRT scanline overlay sits over everything.
 
