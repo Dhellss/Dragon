@@ -119,17 +119,33 @@ main.leaving{opacity:0;transform:translateY(6px);filter:blur(3px);transition:opa
   .mid-gap{display:none}
   .side{max-width:none}
 }
-/* small screens: simple, no motion */
+/* small screens: same scene, simpler motion */
 @media (max-width:600px){
-  *,*::before,*::after{animation:none!important;transition:none!important}
   .top{flex-direction:column;align-items:flex-start;gap:8px}
-  .tab-dot,.drop{display:none}
+  .drop{display:none}                    /* no flying dot on phones — the page fades instead */
   main{padding-bottom:20px}
   .split{grid-template-columns:1fr;padding-top:250px}
   .dragon-wrap{top:96px;width:220px}
   .dragon{width:220px;height:220px}
   .side.right{justify-self:stretch}
-  .jar:hover .glass{transform:none}
   .foot{position:relative;left:auto;bottom:auto;translate:none;z-index:6;display:block;width:fit-content;max-width:calc(100% - 32px);margin:0 auto 24px;font-size:11px;white-space:normal;text-align:center}
+
+  /* windows rise in, one after the other */
+  .win{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+  .side.right .win{animation-delay:.1s}
+  .side.enter-l,.side.enter-r{animation:none}
+  .side.enter-l .win,.side.enter-r .win{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+  .side.enter-r .win{animation-delay:.08s}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}}
+
+  /* the dragon breathes a little so the header never feels dead */
+  .dragon-wrap{animation:bob 5s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-6px)}}
+
+  /* touch feedback instead of hover */
+  .jar:hover .glass{transform:none}
+  .jar:active .glass{transform:rotate(-5deg) scale(.97)}
+  .proj:active{background:rgba(var(--lamp),.09)}
+  .row button:active,.tabs a:active{opacity:.6}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
